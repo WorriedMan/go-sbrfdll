@@ -240,3 +240,11 @@ func Test_runOperation_close(t *testing.T) {
 	result := operationResult{sleep: sleep, rrn: ""}
 	checkResultFileContent(30, result, t)
 }
+
+func Test_runOperation_ping(t *testing.T) {
+	params := []string{"", "40", "ping"}
+	terminal := getMockTerminal(13, "", t)
+	runOperation(terminal, params)
+	result := operationResult{}
+	checkResultFileContent(40, result, t)
+}

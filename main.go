@@ -38,6 +38,7 @@ func initLogger() {
 // для возврата: [1] - id операции, [2] - return, [3] - сумма (опционально 0), [4] - rrn (опционально)
 // для отмены: [1] - id операции, [2] - cancel, [3] - сумма (опционально 0), [4] - rrn
 // для закрытия смены: [1] - id операции, [2] - close
+// для проверки связи: [1] - id операции, [2] - ping
 func runOperation(sber Terminal, params []string) {
 	u64, err := strconv.ParseUint(params[1], 10, 32)
 	if err != nil {
@@ -77,6 +78,11 @@ func runOperation(sber Terminal, params []string) {
 		}
 	case "close":
 		result, err = shiftCloseOperation(sber)
+		if err != nil {
+			log.Fatal("Unable to complete close operation", err)
+		}
+	case "ping":
+		result, err = pingOperation(sber)
 		if err != nil {
 			log.Fatal("Unable to complete close operation", err)
 		}
@@ -247,6 +253,17 @@ func shiftCloseOperation(sber Terminal) (operationResult, error) {
 	var r operationResult
 	log.Println("-----Shift close-----")
 	r, err := runTerminalFunction(sber, 6000, false)
+	if err != nil {
+		return r, errors.Wrap(err, "run terminal function")
+	}
+	return r, nil
+}
+
+// pingOperation вызывает на терминале операцию проверки связи
+func pingOperation(sber Terminal) (operationResult, error) {
+	var r operationResult
+	log.Println("-----Ping-----")
+	r, err := runTerminalFunction(sber, 13, false)
 	if err != nil {
 		return r, errors.Wrap(err, "run terminal function")
 	}
